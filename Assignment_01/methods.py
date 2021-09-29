@@ -112,8 +112,8 @@ def normalized_histograms_test(classes, priors, class_probs, bins, test_data):
 if __name__ == "__main__":
     from data import ls_data, nls_data, real_data
 
-    classes, priors, means, covs, train_data, test_data = bayesian_train(ls_data)
-    truth, prediction, data = bayesian_test(classes, priors, means, covs, test_data)
+    # classes, priors, means, covs, train_data, test_data = bayesian_train(ls_data)
+    # truth, prediction, data = bayesian_test(classes, priors, means, covs, test_data)
 
     # classes, priors, means, covs, train_data, test_data = bayesian_train(nls_data)
     # truth, prediction, data = bayesian_test(classes, priors, means, covs, test_data)
@@ -124,8 +124,8 @@ if __name__ == "__main__":
     # classes, priors, class_probs, bins, train_data, test_data = normalized_histograms_train(ls_data)
     # truth, prediction, data = normalized_histograms_test(classes, priors, class_probs, bins, test_data)    
 
-    # classes, priors, class_probs, bins, train_data, test_data = normalized_histograms_train(nls_data)
-    # truth, prediction, data = normalized_histograms_test(classes, priors, class_probs, bins, test_data)
+    classes, priors, class_probs, bins, train_data, test_data = normalized_histograms_train(nls_data)
+    truth, prediction, data = normalized_histograms_test(classes, priors, class_probs, bins, test_data)
 
     fig, ax = plt.subplots(ncols=2, figsize=(5 * 2, 5 * 1))
     color = np.array(["red", "green", "blue"])
@@ -150,12 +150,19 @@ if __name__ == "__main__":
 
     print('\nFalse Negatives(FN) = ', cm[1,0])
 
-
-    # print(classification_report(truth, prediction))
-
     ax[0].set_title("prediction")
     ax[1].set_title("Truth")
     fig.suptitle(f"accuracy : {accuracy*100:.5f}", fontsize=20)
 
     plt.legend()
     plt.show()
+    plt.close()
+
+    # fig, ax = plt.subplots(nrows=2, ncols=2)
+
+    # for i in range(classes):
+    #     for j, k in enumerate(class_probs[i]):
+    #         ax[i,j].bar(bins[i][j][:-1], k)
+    #         ax[i,j].set_title(f" class {i}, feature {j} ")
+
+    # plt.show()
