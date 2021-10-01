@@ -118,14 +118,14 @@ if __name__ == "__main__":
     # classes, priors, means, covs, train_data, test_data = bayesian_train(nls_data)
     # truth, prediction, data = bayesian_test(classes, priors, means, covs, test_data)
 
-    # classes, priors, means, covs, train_data, test_data = bayesian_train(real_data)
-    # truth, prediction, data = bayesian_test(classes, priors, means, covs, test_data)
+    classes, priors, means, covs, train_data, test_data = bayesian_train(real_data)
+    truth, prediction, data = bayesian_test(classes, priors, means, covs, test_data)
 
     # classes, priors, class_probs, bins, train_data, test_data = normalized_histograms_train(ls_data)
     # truth, prediction, data = normalized_histograms_test(classes, priors, class_probs, bins, test_data)    
 
-    classes, priors, class_probs, bins, train_data, test_data = normalized_histograms_train(nls_data)
-    truth, prediction, data = normalized_histograms_test(classes, priors, class_probs, bins, test_data)
+    # classes, priors, class_probs, bins, train_data, test_data = normalized_histograms_train(nls_data)
+    # truth, prediction, data = normalized_histograms_test(classes, priors, class_probs, bins, test_data)
 
     fig, ax = plt.subplots(ncols=2, figsize=(5 * 2, 5 * 1))
     color = np.array(["red", "green", "blue"])
@@ -163,6 +163,7 @@ if __name__ == "__main__":
     # for i in range(classes):
     #     for j, k in enumerate(class_probs[i]):
     #         ax[i,j].bar(bins[i][j][:-1], k)
+    #         # print(np.sum(k))
     #         ax[i,j].set_title(f" class {i}, feature {j} ")
 
     # plt.show()
