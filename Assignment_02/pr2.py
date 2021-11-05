@@ -117,7 +117,7 @@ def question1(X_train, Y_train):
         plt.scatter(j['A'], j['B'], label="class "+str(i)+" Test", alpha=0.8, s=10)
 
     centres = model.cluster_centers_
-    plt.plot(centres[:,0], centres[:,1])
+    plt.scatter(centres[:,0], centres[:,1], s = 50)
     # Finally showing the scatter plot
     plt.title("Scatter Plot", fontsize=20)
     plt.xlabel("Attr 1", fontsize=14)
@@ -130,3 +130,5 @@ X_train, X_test = build_data('nls_data\class1.txt', 'nls_data\class2.txt')
 question1(X_train, X_test)
 
 
+
+# %%
