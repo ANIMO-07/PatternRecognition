@@ -5,9 +5,127 @@ import cv2
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.cluster import KMeans
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score
+
+class KMeans:
+
+    def __init__(self, eps=1, max_iters=30):
+        self.eps = eps
+        self.max_iters = max_iters
+
+    def _get_initial_centroids(self, X, k):
+        """
+        k random data points from dataset X
+        """
+        return X[np.random.choice(X.shape[0], size=k, replace=False), ...]
+
+
+    def _get_clusters(self, X, centroids):
+        """
+        Assigns clusters.
+        Args:
+            X (numpy.ndarray): array of sample points, size N:D
+            centroids (numpy.ndarray): array of centroids, size K:D
+        Returns:
+            dict {cluster_number: list_of_points_in_cluster}
+        """
+
+        k = centroids.shape[0]
+
+        clusters = {i:[] for i in range(k)}
+
+        distance_matrix = self._get_euclidean_distance(X, centroids)
+
+        closest_cluster_ids = np.argmin(distance_matrix, axis=1)
+
+        for i in range(k):
+            clusters[i] = np.nonzero(closest_cluster_ids == i)[0]
+
+        return clusters
+
+    def _get_euclidean_distance(self, X, centroids):
+        """
+        Computes euclidean distance.
+
+        X => n x d
+        centroids => k x d
+        """
+
+        k = centroids.shape[0]
+
+        distances = np.sum(np.power(X[:, None, :] - centroids[None, ...], 2), axis=2)
+
+        return np.sqrt(distances)
+
+        # A_square = np.reshape(np.sum(X * X, axis=1), (X.shape[0], 1))
+        # B_square = np.reshape(np.sum(centroids * centroids, axis=1), (1, centroids.shape[0]))
+        # AB = X @ centroids.T
+
+        # C = -2 * AB + B_square + A_square
+
+        # return np.sqrt(C)
+
+    def _has_centroids_covered(self, previous_centroids, new_centroids):
+        """
+        checks if any of centroids moved more then eps
+        Args:
+            previous_centroids (numpy.ndarray): array of k old centroids, size K:D
+            new_centroids (numpy.ndarray): array of k new centroids, size K:D
+            distance_mesuring_method (function): function taking 2 Matrices A (N1:D) and B (N2:D) and returning distance
+            movement_threshold_delta (float): threshold value, if centroids move less we assume that algorithm covered
+        Returns: boolean True if centroids coverd False if not
+        """
+        distances_between_old_and_new_centroids = np.sqrt(np.sum(np.power(previous_centroids - new_centroids, 2), axis=1))
+        centroids_moved = np.max(distances_between_old_and_new_centroids) > self.eps
+
+        return centroids_moved
+
+
+    def fit(self, X, k):
+        X = np.asarray(X)
+        print("Fitting....")
+        new_centroids = self._get_initial_centroids(X=X, k=k)
+
+        centroids_moved = False
+        iterations = 0
+        while 1:
+            if (iterations > self.max_iters):
+                break
+            
+            previous_centroids = new_centroids.copy()
+            clusters = self._get_clusters(X, previous_centroids)
+
+            new_centroids = np.array(
+                            [
+                        np.mean(X[clusters[i]], axis=0) 
+                        for i in range(k)
+                    ]
+                )
+
+            centroids_moved = self._has_centroids_covered(
+                                previous_centroids, new_centroids)
+            
+            if iterations != 0 and centroids_moved == False:
+                break
+            
+            iterations += 1
+
+        self.centers = new_centroids.copy()
+
+        return self
+
+    def fit_predict(self, X, k):
+        self.fit(X, k)
+
+        return self.predict(X)
+
+    def predict(self, X):
+        X = np.asarray(X)
+        print("Predicting....")
+        distance = self._get_euclidean_distance(X, self.centers)
+        assigned_centroid = np.argmin(distance, axis=1)
+        return assigned_centroid, self.centers
 
 # %% q1
 
@@ -28,23 +146,19 @@ def build_data(class1_path, class2_path):
 
 def question1(X, Y):
 
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, random_state=42, test_size=30)
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, random_state=42, test_size=0.30)
+    # breakpoint()
 
-    model = KMeans(2)
-    model.fit(X_train.values)
-    preds = model.labels_
-    
-    print("Confusion Matrix: \n", confusion_matrix(preds, Y_train))
-    print("Accuracy:", accuracy_score(preds, Y_train))
+    colors = np.array(["orange", "blue"])
+    model = KMeans()
+    preds, _ = model.fit_predict(X_train.values, 2)
 
-    X_train["Class"] = preds
+    X_test["pred"], centres = model.predict(X_test.values)
 
-    for i, j in X_train.groupby('Class'):
-        plt.scatter(j['A'], j['B'], label="class "+str(i)+" Test", alpha=0.8, s=10)
+    for i, j in X_test.groupby('pred'):
+        plt.scatter(j['A'], j['B'], c=colors[j['pred']], label="class "+str(i)+" Test", alpha=0.8, s=10)
 
-    centres = model.cluster_centers_
-    plt.scatter(centres[:,0], centres[:,1], s = 50)
-    # Finally showing the scatter plot
+    plt.scatter(centres[:,0], centres[:,1], c=colors[model.predict(centres)[0]], s=50)
     plt.title("Scatter Plot", fontsize=20)
     plt.xlabel("Attr 1", fontsize=14)
     plt.ylabel("Attr 2", fontsize=14)
@@ -61,10 +175,7 @@ question1(X, Y)
 def KMeansCluster(vectorized, K=5):
     # K means clustering using the vectorized linear array
 
-    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-
-    attempts = 10
-    ret, label, center = cv2.kmeans(vectorized, K, None, criteria, attempts, cv2.KMEANS_PP_CENTERS)
+    label, center = KMeans(max_iters=30).fit_predict(vectorized, K)
 
     center = np.uint8(center)
 
