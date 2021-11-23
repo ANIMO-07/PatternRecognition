@@ -152,19 +152,20 @@ def gmm_predict(data, ncomponents=2):
 
 def plot_predict(data):
     # uncomment for plots
-    plt.scatter(data["x"], data["y"], c=data["class"])
+    plt.figure(100)
+    plt.scatter(data["x"], data["y"], c=data["class"], label=data["class"])
     plt.title("plot of data")
-    plt.show()
 
+    # plt.figure(200)
     sns.jointplot(data=data, x="x", y="y", hue="class")
-    plt.show()
 
     assigned = gmm_predict(data)
 
     data["assigned"] = assigned
     accuracy = np.sum(assigned == np.asarray(data["class"])) / assigned.shape[0]
 
-    plt.scatter(data["x"], data["y"], c=data["assigned"])
+    plt.figure(300)
+    plt.scatter(data["x"], data["y"], c=data["assigned"], label=data["assigned"])
     plt.title(f"plot of predicted data | Accuracy = {accuracy*100:.03f}%")
     plt.show()
 
