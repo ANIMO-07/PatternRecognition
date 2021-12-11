@@ -1,11 +1,5 @@
-import pandas as pd
 import numpy as np
 import random
-from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-from sklearn.metrics import accuracy_score, confusion_matrix
-from sklearn.neural_network import MLPClassifier
-from sklearn.svm import SVC
 
 
 class Perceptron:
@@ -15,10 +9,13 @@ class Perceptron:
         self.n_iter = n_iter
 
     def fit(self, X, y):
-        self.w_ = [random.uniform(-1.0, 1.0) for _ in range(1 + X.shape[1])]  # randomly initialize weights
-        self.errors_ = []  # keeps tracks of the number of errors per iteration for observation purposes
+        # randomly initialize weights
+        self.w_ = [random.uniform(-1.0, 1.0) for _ in range(1 + X.shape[1])]
+        # keeps tracks of the number of errors per iteration
+        self.errors_ = []
 
-        # iterate over labelled dataset updating weights for each features accordingly
+        # iterate over labelled dataset
+        # updating weights for each features accordingly
         for _ in range(self.n_iter):
             errors = 0
             for xi, label in zip(X, y):
@@ -28,6 +25,11 @@ class Perceptron:
                 errors += int(update != 0.0)
             self.errors_.append(errors)
         return self
+
+    # compute the net input i.e scalar sum of X and the weights
+    # plus the bias value
+    def net_input(self, X):
+        return np.dot(X, self.w_[1:]) + self.w_[0]
 
     # predict a classification for a sample of features X
     def predict(self, X):
