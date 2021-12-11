@@ -75,13 +75,9 @@ class KMeans:
             previous_centroids = new_centroids.copy()
             clusters = self._get_clusters(X, previous_centroids)
 
-            new_centroids = np.array(
-                [np.mean(X[clusters[i]], axis=0) for i in range(k)]
-            )
+            new_centroids = np.array([np.mean(X[clusters[i]], axis=0) for i in range(k)])
 
-            centroids_moved = self._has_centroids_covered(
-                previous_centroids, new_centroids
-            )
+            centroids_moved = self._has_centroids_covered(previous_centroids, new_centroids)
 
             if iterations != 0 and centroids_moved == False:
                 break
@@ -124,9 +120,7 @@ def build_data(class1_path, class2_path):
 
 def question1(X, Y):
 
-    X_train, X_test, Y_train, Y_test = train_test_split(
-        X, Y, random_state=42, test_size=0.30
-    )
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, random_state=42, test_size=0.30)
 
     colors = np.array(["orange", "blue"])
     model = KMeans()
@@ -144,6 +138,10 @@ def question1(X, Y):
             s=10,
         )
 
+    score = accuracy_score(X_test["pred"], Y_test)
+    if score < 0.5:
+        score = 1 - score
+    print("Accuracy Score for K-means on NLS data:", score)
     plt.scatter(centres[:, 0], centres[:, 1], c=colors[model.predict(centres)[0]], s=50)
     plt.title("Scatter Plot", fontsize=20)
     plt.xlabel("Attr 1", fontsize=14)
@@ -153,10 +151,7 @@ def question1(X, Y):
     plt.close()
 
 
-X, Y = build_data(
-        os.path.join("./nls_data", "class1.txt"),
-        os.path.join("./nls_data", "class2.txt")
-    )
+X, Y = build_data(os.path.join("./nls_data", "class1.txt"), os.path.join("./nls_data", "class2.txt"))
 question1(X, Y)
 
 # %% q2 funcs
@@ -198,10 +193,7 @@ print(" Part 2")
 weights = 1
 x_len, y_len = image.shape[:-1]
 
-xx, yy = np.meshgrid(
-    np.arange(y_len) * 256 * weights / y_len, 
-    np.arange(x_len) * 256 * weights / x_len
-)
+xx, yy = np.meshgrid(np.arange(y_len) * 256 * weights / y_len, np.arange(x_len) * 256 * weights / x_len)
 
 locs = np.dstack((xx, yy)).reshape(-1, 2)
 

@@ -29,10 +29,7 @@ class Perceptron:
             self.errors_.append(errors)
         return self
 
-    # compute the net input i.e scalar sum of X and the weights plus the bias value
-    def net_input(self, X):
-        return np.dot(X, self.w_[1:]) + self.w_[0]
-
     # predict a classification for a sample of features X
     def predict(self, X):
-        return np.where(self.net_input(X) >= 0.0, 1, -1)
+        decision = np.dot(X, self.w_[1:]) + self.w_[0]
+        return np.where(decision >= 0.0, 1, -1)
